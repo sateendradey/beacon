@@ -16,26 +16,30 @@ app.use(bodyParser.urlencoded({
 }));
 app.use(express.json());
 
-var profiles = [
-    {
-        "Name": "Amit1",
-        "Terminal": "B",
-        "GateNumber": "26",
-        "Airlines":"American"
-    },
-    {
-        "Name": "Amit2",
-        "Terminal": "C",
-        "GateNumber": "26",
-        "Airlines":"American"
-    }
-];
-
-
-var beacons = [];
-
 app.get('/', (req, res) => res.send('Hello World!'))
+// beacon end points
 
+app.post('/createbeacon', function (req, res) {
+   const new_beacon = {
+       desc: req.body.desc,
+       lat: req.body.lat,
+       lon: req.body.lon,
+       time: req.body.time,
+       userid: req.body.userid,
+       status: '0' 
+   };
+    CreateBeacon(new_beacon, function(response){
+	   console.log(response);
+        res.send(response);
+    });
+});
+
+//complete beacon
+app.post('/completebeacon', function (req, res) {   
+});
+
+//user end points
+//to get user's profile
 app.get('/profile/:id', function (req, res) {
     var prof_id = req.params.id;
     //request.query : for query string params
@@ -46,25 +50,29 @@ app.get('/profile/:id', function (req, res) {
     });
 });
 
-app.get('/beacon', function (req, res) {
-    //var bec_id = req.params.id;
-    //res.send(GetBeacon(bec_id));
-    GetBeacon(function(response){
+// get active becons nearby
+app.get('/activebeacons', function (req, res) {
+     GetBeacon(function(response){
 	   console.log(response);
         res.send(response);
     });
 });
 
+
+//to create users profile
 app.post('/profile', function (req, res) {
+    dateTime = getCurrDateTime();
    const new_prof = {
-       uname: req.body.uname, // username
+       uname: req.body.uname, // username: email
        pass:req.body.pass, // password
        name: req.body.name, // name
-       gate: req.body.gate, // gate no
+       gate: 'X', // gate no
        phn: req.body.phn, // phone
-       airl: req.body.airl, // airline
-       lat:req.body.lat,
-       lon:req.body.lon,
+       airl: 'NoAirline', // airline
+       lat:'0',
+       lon:'0',
+       lasttime:dateTime,
+       credits:0,
        stat:'1'
    };     
     AddProfile(new_prof,function(response){
@@ -74,28 +82,29 @@ app.post('/profile', function (req, res) {
     
 });
 
-app.post('/beacon', function (req, res) {
-   const new_beacon = {
-       desc: req.body.desc,
-       loc: req.body.loc,
-       time: req.body.time,
-       userid: req.body.userid,
-       status: '0' 
-   };
-	console.log(new_beacon);
-    CreateBeacon(new_beacon, function(response){
-	   console.log(response);
-        res.send(response);
+//to login: capture current location and login time
+app.post('/login', function(req, res){
+    processLogin(req.body,function(response){
+       console.log(response);
+        res.send(response);    
     });
 });
 
-app.post('/login', function(req, res){
-    
-});
+// Accept beacon
 
-function getProfile(prof_id){
-    return profiles[prof_id];
-}
+// Logout : change status
+
+// get beacon status
+
+
+
+
+
+
+
+
+
+
 
 function AddProfile(new_prof, callback){
 var dbo = db.db("User_DB");
@@ -143,14 +152,15 @@ function getProfile(user_id, callback) {
     });
 }
 
-function processLogin(userid, callback){
-  var dbo = db.db("mydb");
-  var myquery = { address: "Valley 345" };
-  var newvalues = { $set: {name: "Mickey", address: "Canyon 123" } };
-  dbo.collection("customers").updateOne(myquery, newvalues, function(err, res) {
-    if (err) throw err;
+function processLogin(body_obj,callback){
+  var dbo = db.db("User_DB");
+  var myquery = { uname: body_obj.userid };
+  var dateTime = getCurrDateTime();  
+  var newvalues = { $set: {lasttime: dateTime, lat: body_obj.lat, lon:body_obj.lon, airl:body_obj.airl,  gate:body_obj.gate} };
+  dbo.collection("Details_Cols").updateOne(myquery, newvalues, function(err, res) {
+    if (err) {callback("fail")}
     console.log("1 document updated");
-    db.close();
+      callback("Success");
   });
 }
 
@@ -170,6 +180,17 @@ function distance(lat1, lon1, lat2, lon2, unit) {
     if (unit=="N") { dist = dist * 0.8684 }
     return dist
 }
+
+function getCurrDateTime(){
+    var today = new Date();
+    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var dateTime = date+' '+time;
+    return dateTime;
+}
+
+
+//function sendNotification(beacon,callback){}
 
 MongoClient.connect(dburi, function (err, database) {
    if (err) 
