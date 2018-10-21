@@ -2,7 +2,14 @@ const express = require('express')
 const app = express()
 var bodyParser = require('body-parser');
 const port = process.env.PORT || 3000
-
+var cors = require('cors')
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,PUT,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+app.use(cors(corsOptions));
 
 // database integration
 const dburi = "mongodb+srv://sateendradey:WordPass1990!@cluster0-wgoht.mongodb.net/test?retryWrites=true";
