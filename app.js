@@ -2,7 +2,7 @@ const express = require('express')
 const app = express()
 var bodyParser = require('body-parser');
 const port = process.env.PORT || 3000
-const cors = require('cors');//
+
 
 // database integration
 const dburi = "mongodb+srv://sateendradey:WordPass1990!@cluster0-wgoht.mongodb.net/test?retryWrites=true";
@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(express.json());
-app.use(cors());//
+
 app.get('/', (req, res) => res.send('Hello World!'))
 // beacon end points
 
