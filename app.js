@@ -103,7 +103,7 @@ app.get('/profile/:id', function (req, res) {
     var prof_id = req.params.id;
     //request.query : for query string params
     //res.send(getProfile(prof_id));
-    getProfile("amitr", function(response){
+    getProfile(prof_id, function(response){
 	   console.log(response);
         res.send(response);
     });
