@@ -4,7 +4,16 @@ const bodyParser = require('body-parser');
 const port = process.env.PORT || 3000
 const path = require("path");
 const webpush = require("web-push");
+
 var cors = require('cors');
+const corsOptions = {
+  origin: '*',
+  methods: 'GET,PUT,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
@@ -15,14 +24,7 @@ app.use(express.json());
 
 app.use(express.static(path.join(__dirname, "client")));
 
-const corsOptions = {
-  origin: '*',
-  methods: 'GET,PUT,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: 204,
-};
 
-app.use(cors(corsOptions));
 
 // database integration
 const dburi = "mongodb+srv://sateendradey:WordPass1990!@cluster0-wgoht.mongodb.net/test?retryWrites=true";
