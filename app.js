@@ -25,7 +25,7 @@ app.post('/createbeacon', function (req, res) {
        lat: req.body.lat,
        lon: req.body.lon,
        time: req.body.time,
-       userid: req.body.userid,
+       uname: req.body.uname,
        status: '0' 
    };
     CreateBeacon(new_beacon, function(response){
@@ -91,6 +91,12 @@ app.post('/login', function(req, res){
 });
 
 // Accept beacon
+app.post('/beaconaccept', function(req, res){
+    acceptBeacon(req.body,function(response){
+       console.log(response);
+        res.send(response);    
+    });
+});
 
 // Logout : change status
 
@@ -154,7 +160,7 @@ function getProfile(user_id, callback) {
 
 function processLogin(body_obj,callback){
   var dbo = db.db("User_DB");
-  var myquery = { uname: body_obj.userid };
+  var myquery = { uname: body_obj.uname };
   var dateTime = getCurrDateTime();  
   var newvalues = { $set: {lasttime: dateTime, lat: body_obj.lat, lon:body_obj.lon, airl:body_obj.airl,  gate:body_obj.gate} };
   dbo.collection("Details_Cols").updateOne(myquery, newvalues, function(err, res) {
@@ -162,6 +168,18 @@ function processLogin(body_obj,callback){
     console.log("1 document updated");
       callback("Success");
   });
+}
+
+function acceptBeacon(body_obj,callback){
+    var dbo = db.db("User_DB");
+    var myquery = { uname: body_obj.uname };
+    var dateTime = getCurrDateTime();  
+    var newvalues = { $set: {lasttime: dateTime, lat: body_obj.lat, lon:body_obj.lon, airl:body_obj.airl,  gate:body_obj.gate} };
+    dbo.collection("Details_Cols").updateOne(myquery, newvalues, function(err, res) {
+        if (err) {callback("fail")}
+        console.log("1 document updated");
+          callback("Success");
+      });
 }
 
 function distance(lat1, lon1, lat2, lon2, unit) {
