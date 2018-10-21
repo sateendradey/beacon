@@ -82,6 +82,7 @@ app.post('/beacon', function (req, res) {
        userid: req.body.userid,
        status: '0' 
    };
+	console.log(new_beacon);
     CreateBeacon(new_beacon, function(response){
 	   console.log(response);
         res.send(response);
