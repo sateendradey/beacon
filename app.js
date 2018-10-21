@@ -243,8 +243,13 @@ function processLogin(body_obj,callback){
   var newvalues = { $set: {lasttime: dateTime, lat: body_obj.lat, lon:body_obj.lon, airl:body_obj.airl,  gate:body_obj.gate} };
   dbo.collection("Details_Cols").updateOne(myquery, newvalues, function(err, res) {
     if (err) {callback("fail")}
-    console.log("1 document updated");
+    if (res.result.nModified == 0 ){
+      callback("Fail");
+    } 
+    else{ 
+      console.log(res.result.nModified+" document updated");
       callback("Success");
+    }
   });
 }
 
